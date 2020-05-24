@@ -216,6 +216,8 @@ void CMapper::ProcessMapping( )
     }
 
     m_PEData.m_dwEntry = m_pNTHeaders->OptionalHeader.AddressOfEntryPoint;
+    
+    memset( m_aImage.data( ), 0x00, m_pNTHeaders->OptionalHeader.SizeOfHeaders ); // yep
 }
 
 std::map< std::string, std::string > CMapper::GetImports( )
