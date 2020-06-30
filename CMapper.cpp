@@ -206,7 +206,11 @@ void CMapper::ProcessMapping( )
     for ( int i = 0; i < m_pNTHeaders->FileHeader.NumberOfSections; i++ )
     {
         if( strcmp( ".reloc", ( char* ) m_pSectionHeader[ i ].Name ) == 0 )
+        {
+            void* m_pDest = m_aImage.data( ) + m_pSectionHeader[ i ].PointerToRawData;
+            memset( m_pDest, 0x17, m_pSectionHeader[ i ].SizeOfRawData );
             continue;
+        }
 
         CSection m_Section;
         m_Section.m_iVirtualAddress = m_pSectionHeader[ i ].VirtualAddress;
@@ -216,20 +220,21 @@ void CMapper::ProcessMapping( )
     }
 
     m_PEData.m_dwEntry = m_pNTHeaders->OptionalHeader.AddressOfEntryPoint;
-    
-    memset( m_aImage.data( ), 0x00, m_pNTHeaders->OptionalHeader.SizeOfHeaders ); // yep
+
+    m_aMappedImage.resize( m_aImage.size( ) - m_pNTHeaders->OptionalHeader.SizeOfHeaders );
+    std::memcpy( m_aMappedImage.data( ), m_aImage.data( ) + m_pNTHeaders->OptionalHeader.SizeOfHeaders, m_aMappedImage.size( ) );
 }
 
 std::map< std::string, std::string > CMapper::GetImports( )
 {
-    std::map< std::string, std::string > m_aImportList;
+    std::map< std::string, std::string > m_aImportList = { };
 
     for ( const CImport& m_Import : m_aImports )
     {
         std::string m_sCurrentModule = std::string( m_Import.m_pszModule );
 
         for ( const std::string& m_sFunction : m_Import.m_aFunctions )
-            m_aImportList.insert( std::pair< std::string, std::string >( m_sCurrentModule, m_sFunction ) );
+            m_aImportList.insert( std::make_pair( m_sCurrentModule, m_sFunction ) );
     }
 
     return m_aImportList;
@@ -240,7 +245,7 @@ CMapper::CPEData CMapper::GetData( )
     return m_PEData;
 }
 
-std::vector<std::uint8_t> CMapper::GetMappedImage( )
+std::vector< std::uint8_t > CMapper::GetMappedImage( )
 {
-    return m_aImage;
+    return m_aMappedImage;
 }

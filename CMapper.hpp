@@ -54,6 +54,7 @@ private:
     void OpenBinary( std::string& m_sSource, std::vector< std::uint8_t >& m_aData );
 
     std::vector< std::uint8_t > m_aImage;
+    std::vector< std::uint8_t > m_aMappedImage;
 
     std::uint64_t m_dwImageBase = 0x00;
 
