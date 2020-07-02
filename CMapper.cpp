@@ -214,7 +214,7 @@ void CMapper::ProcessMapping( )
 
         CSection m_Section;
         m_Section.m_iVirtualAddress = m_pSectionHeader[ i ].VirtualAddress;
-        m_Section.m_iPtrToRaw = m_pSectionHeader[ i ].PointerToRawData;
+        m_Section.m_iPtrToRaw = m_pSectionHeader[ i ].PointerToRawData - m_pNTHeaders->OptionalHeader.SizeOfHeaders;
         m_Section.m_iSizeOfRaw = m_pSectionHeader[ i ].SizeOfRawData;
         m_PEData.m_aSections.emplace_back( m_Section );
     }
